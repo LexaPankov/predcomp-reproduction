@@ -1,0 +1,11 @@
+program,source_file,o3_time_s,best_time_s,speedup_ours,speedup_authors_comb_top3,note
+network_dijkstra,dijkstra_large.c,3.911,3.013,1.298,1.142,
+telecom_gsm,short_term.c,3.569,2.810,1.270,1.279,
+automotive_susan_s,susan.c,3.03,2.550,1.190,1.269,O3 time approximate
+network_patricia,patricia.c,3.523,3.136,1.124,1.089,
+automotive_bitcount,bitcnts.c,3.387,3.107,1.090,1.234,1.126 in an earlier run on 7 Oct (noise)
+telecom_CRC32,crc_32.c,1.989,1.904,1.045,1.424,Aleksei (GCC 11.4): 1.068
+security_blowfish_e,bf_enc.c,4.005,3.856,1.039,1.023,
+security_sha,sha.c,11.112,11.112,1.000,1.563,no prediction beat -O3
+consumer_jpeg_c,jcphuff.c,3.474,3.474,1.000,1.339,no prediction beat -O3
+security_blowfish_d,bf_enc.c,2.663,2.663,1.000,1.070,not comparable: authors' xlsx lists bf_cfb64.c

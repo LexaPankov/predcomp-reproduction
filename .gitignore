@@ -1,0 +1,6 @@
+*.log
+__pycache__/
+*.pyc
+.DS_Store
+PredComp/
+PredComp_taco/
