@@ -21,7 +21,7 @@ find Dataset/cBench_V1.1 -type f \( -name '__run' -o -name '__compile' -o -name 
 grep -q "compile failed for" Dataset/process/heads.py || sed -i "/CompileError.add(self.session,'',cp.stderr.decode('utf-8'))/a\            print('error: compile failed for', self.name); print(cp.stderr.decode('utf-8')[-3000:])" Dataset/process/heads.py
 grep -q "skipped: -O3" main.py || sed -i "s|^        cbench\[p\].prepare()$|        cbench[p].prepare()\n        if cbench[p].O3_perf is None:\n            print(f'{p} skipped: -O3 compile/run failed'); continue|" main.py
 # Issue 18: -lm must come after the object files when linking
-grep -rl -- "-lm \*.o" --include=*.py . | xargs -r sed -i 's|-lm \*\.o\(.*\)|*.o\1 -lm|'
+grep -rl -- "-lm \*.o" --include=*.py . | xargs -r sed -i -E 's/-lm \*\.o( -o [A-Za-z0-9_.]+)?/*.o\1 -lm/'
 grep -rq -- "-lm \*.o" --include=*.py . && echo "WARNING: Issue 18 not patched, move -lm after *.o by hand" || true
 # Test copy of main.py that runs only one program
 sed "s|prog=json.load(f)|prog=json.load(f); prog={'automotive_bitcount': prog['automotive_bitcount']}|" main.py > main_test.py
