@@ -78,11 +78,35 @@ python main.py      --bin_path /usr/bin 2>&1 | tee full_run.log   # all 10 progr
 
 Files created inside the container belong to root. After `exit`, run `sudo chown -R $USER PredComp`.
 
+## Rigorous measurements (in progress)
+
+`scripts/measure.py` re-times PredComp's Top-3 sequences against `-O3`, following
+Prof. De Sensi's advice and Hoefler & Belli (SC'15):
+
+- the authors' own build commands, and every output checked against `-O3` before timing;
+- 5 warm-up runs per configuration, not counted;
+- measured runs **interleaved in a new random order every round**, so machine drift hits all configurations equally;
+- every single time saved (`*_raw.csv`);
+- runs continue until the 95% CI of the median is within 1% (10 to 50 rounds);
+- mean, median, standard deviation, 95% CIs, and the speed-up over `-O3` with a bootstrap 95% CI (`summary.csv`);
+- the MD5 of each binary: if a sequence produces **the same binary as `-O3`**, any measured difference is pure noise.
+
+It only needs Python's standard library, so it runs inside the Docker image (GCC 9.4) and directly on a node (GCC 13.3).
+On the department cluster (SLURM), with a whole node per job (`--exclusive`):
+
+```bash
+cd ~/predcomp-reproduction
+sbatch scripts/cluster_measure.sh gcc9     # Ubuntu 20.04 container, GCC 9.4
+sbatch scripts/cluster_measure.sh gcc13    # node's own GCC 13.3
+```
+
 ## Repository layout
 
 ```
 docker/Dockerfile          environment with all dependency fixes
 scripts/apply_patches.sh   fixes to the original code
+scripts/measure.py         rigorous timing (warm-ups, interleaving, CIs)
+scripts/cluster_measure.sh SLURM job for the cluster
 docs/ISSUES.md             the 18 reproducibility issues
 results/                   measured data
 ```
