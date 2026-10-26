@@ -55,7 +55,7 @@ You need Linux (or WSL2) with Docker and git.
 
 **1. Get this repository and the original code** (side by side):
 ```bash
-git clone https://github.com/<our-account>/predcomp-reproduction.git
+git clone https://github.com/LexaPankov/predcomp-reproduction.git
 git clone https://github.com/LanduBing/PredComp_taco.git
 ```
 
