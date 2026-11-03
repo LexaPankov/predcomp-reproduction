@@ -1,0 +1,10 @@
+{
+  "host": "f1fe44bbbe92",
+  "date": "2026-10-26 16:31:04",
+  "kernel": "6.8.0-55-generic",
+  "compiler": "gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0",
+  "cpu": "AMD EPYC 7301 16-Core Processor",
+  "slurm_job": "",
+  "python": "3.9.21",
+  "command": "/work/repo/scripts/measure.py --cbench /work/cbench --program all --from-log /work/logs/full_run_docker.log --from-log /work/logs/full_run_docker_part2.log --from-log /work/logs/full_run_docker_susan.log --from-log /work/logs/test_run_docker.log --out /work/repo/results/cluster_gcc9_job1035047"
+}

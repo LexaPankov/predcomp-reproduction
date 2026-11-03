@@ -4,7 +4,8 @@
 #   sbatch scripts/cluster_measure.sh gcc9    # inside our Docker image: Ubuntu 20.04, GCC 9.4 (like the paper)
 #   sbatch scripts/cluster_measure.sh gcc13   # directly on the node: Ubuntu 24.04, GCC 13.3 (recent GCC)
 #
-# The two can run at the same time: each mode works on its own copy of cBench.
+# The two can run at the same time: each job works on its own copy of cBench.
+# Only some programs:  sbatch scripts/cluster_measure.sh gcc9 --program automotive_susan_s,consumer_jpeg_c
 #
 # Needs, in your home folder:
 #   ~/PredComp                  the authors' code, after scripts/apply_patches.sh
@@ -23,7 +24,10 @@ MODE=${1:-gcc9}
 shift || true                           # anything after the mode goes to measure.py, e.g. --max-rounds 30
 REPO=$HOME/predcomp-reproduction
 NAME=cluster_${MODE}_job${SLURM_JOB_ID}
-WORK=$HOME/cbench_$MODE                 # private copy of cBench for this mode
+# private copy of cBench on the node's LOCAL disk: no network-filesystem I/O during timing,
+# and two jobs never share a copy. Results are still written to the home folder.
+WORK=/tmp/${USER}_cbench_${MODE}_${SLURM_JOB_ID}
+trap 'rm -rf "$WORK"' EXIT
 
 echo "node: $(hostname)  mode: $MODE  job: $SLURM_JOB_ID"
 ls $HOME/logs/*.log >/dev/null           # stop early if there are no logs
@@ -35,7 +39,7 @@ if [ "$MODE" = "gcc9" ]; then
     docker image inspect predcomp:focal >/dev/null 2>&1 || docker load -i $HOME/predcomp_focal.tar
     # --user: files written to the home folder stay ours
     # no --privileged: measure.py times with Python's clock, so perf is not needed
-    docker run --rm --user "$(id -u):$(id -g)" \
+    docker run --rm --user "$(id -u):$(id -g)" -e SLURM_JOB_ID \
         -v "$WORK":/work/cbench -v $REPO:/work/repo -v $HOME/logs:/work/logs \
         predcomp:focal \
         python /work/repo/scripts/measure.py --cbench /work/cbench --program all \

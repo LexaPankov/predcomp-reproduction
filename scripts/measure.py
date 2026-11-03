@@ -303,7 +303,7 @@ def measure_program(prog, configs, a, out_dir):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--cbench", required=True, help="path to Dataset/cBench_V1.1")
-    ap.add_argument("--program", required=True, help="cBench program name, or 'all' (with --from-log)")
+    ap.add_argument("--program", required=True, help="cBench program name(s), comma-separated, or 'all' (with --from-log)")
     ap.add_argument("--from-log", action="append", default=[],
                     help="log of the authors' main.py: use its Top-k sequences (repeatable)")
     ap.add_argument("--flags", action="append", default=[], help="extra flag sequence (repeatable)")
@@ -323,7 +323,7 @@ def main():
     from_log = {}
     for path in a.from_log:
         from_log.update(read_log(os.path.expanduser(path)))
-    progs = sorted(from_log) if a.program == "all" else [a.program]
+    progs = sorted(from_log) if a.program == "all" else [x.strip() for x in a.program.split(",") if x.strip()]
     for p in progs:
         if p not in PROGRAMS:
             sys.exit(f"unknown program {p}; known: {', '.join(PROGRAMS)}")

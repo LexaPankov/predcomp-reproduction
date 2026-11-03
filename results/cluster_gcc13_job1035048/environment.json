@@ -1,0 +1,10 @@
+{
+  "host": "node148",
+  "date": "2026-10-26 16:30:07",
+  "kernel": "6.8.0-55-generic",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+  "cpu": "AMD EPYC 7301 16-Core Processor",
+  "slurm_job": "1035048",
+  "python": "3.12.3",
+  "command": "/home/pavel_2247996/predcomp-reproduction/scripts/measure.py --cbench /home/pavel_2247996/cbench_gcc13 --program all --from-log /home/pavel_2247996/logs/full_run_docker.log --from-log /home/pavel_2247996/logs/full_run_docker_part2.log --from-log /home/pavel_2247996/logs/full_run_docker_susan.log --from-log /home/pavel_2247996/logs/test_run_docker.log --out /home/pavel_2247996/predcomp-reproduction/results/cluster_gcc13_job1035048"
+}
