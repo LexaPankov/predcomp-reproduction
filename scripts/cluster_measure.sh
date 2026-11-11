@@ -31,7 +31,7 @@ trap 'rm -rf "$WORK"' EXIT
 
 echo "node: $(hostname)  mode: $MODE  job: $SLURM_JOB_ID"
 ls $HOME/logs/*.log >/dev/null           # stop early if there are no logs
-rm -rf "$WORK" && cp -a $HOME/PredComp/Dataset/cBench_V1.1 "$WORK"
+rm -rf "$WORK" && cp -r $HOME/PredComp/Dataset/cBench_V1.1 "$WORK"
 mkdir -p $REPO/results/$NAME
 
 if [ "$MODE" = "gcc9" ]; then

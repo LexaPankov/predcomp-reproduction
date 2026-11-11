@@ -38,34 +38,37 @@ Brackets: bootstrap 95% confidence interval.
 | telecom_gsm | 1.279 | 1.092 | **1.092** [1.084, 1.096] | 0.994 [0.988, 0.997] |
 | network_patricia | 1.089 | 1.048 | **1.057** [1.050, 1.069] | **1.019** [1.012, 1.030] |
 | network_dijkstra | 1.142 | 0.764 | **1.053** [1.045, 1.057] | **1.070** [1.063, 1.074] |
-| automotive_susan_s | 1.269 | 0.977 | 1.022 [0.950, 1.091] | **1.086** [1.086, 1.087] |
-| consumer_jpeg_c | 1.339 | 1.007 | 1.007 [0.994, 1.020] | 0.945 [0.926, 0.970] |
+| automotive_susan_s † | 1.269 | 1.044 | **1.044** [1.044, 1.045] | **1.086** [1.086, 1.087] |
+| consumer_jpeg_c † | 1.339 | 1.012 | **1.012** [1.008, 1.014] | 0.945 [0.926, 0.970] |
 | security_blowfish_e | 1.023 | 0.989 | 0.989 [0.988, 0.997] | 0.996 [0.992, 1.000] |
 | security_blowfish_d | 1.070* | 0.987 | 0.987 [0.987, 0.994] | 0.998 [0.997, 0.998] |
 | security_sha | 1.563 | 0.963 | 0.971 [0.965, 0.974] | 0.904 [0.901, 0.909] |
-| **Mean** (keeping `-O3` when nothing beats it) | **1.243** | | **1.105** (geo 1.093) | **1.054** (geo 1.049) |
+| **Mean** (keeping `-O3` when nothing beats it) | **1.243** | 1.072 | **1.108** (geo 1.096) | **1.054** (geo 1.049) |
 
 **Bold:** significantly faster than `-O3` (the whole interval is above 1).
 \*For blowfish_d, the code optimizes `bf_enc.c`, but the authors' spreadsheet lists `bf_cfb64.c`.
+† Re-measured with the benchmark files on the node's local disk (job 1035857); see *Measurement notes*.
 Full table: [results/final_comparison.csv](results/final_comparison.csv). Every single run: `results/cluster_*/*_raw.csv`.
 
 **What we found**
 
-- **GCC 9.4:** the average gain over `-O3` is about **10%, against 24% in the paper**. Only **5 of 10 programs** are significantly faster;
-  for sha and both blowfish programs all three predictions are slower than `-O3`, and for susan_s and jpeg_c there is no significant difference
+- **GCC 9.4:** the average gain over `-O3` is about **11%, against 24% in the paper**. 7 of 10 programs are significantly faster,
+  but for sha and both blowfish programs all three predictions are slower than `-O3`, and susan_s and jpeg_c gain only 4% and 1%
   (the paper reports +27% and +34%). Without CRC32 the average gain is 5%.
 - **The result depends a lot on the machine.** CRC32 gives 1.60× on the cluster but 1.05× on the laptop with the same compiler and flags,
   because `-O3`'s own binary is much slower on this AMD CPU. Dijkstra goes the other way (1.30× laptop, 1.05× cluster).
-- **The Top-1 prediction alone is weaker** (mean 1.065): for dijkstra it is 24% *slower* than `-O3`, and only the third sequence helps.
-  The paper's metric needs all three candidates to be compiled and timed.
+- **The Top-1 prediction alone is weaker** (mean 1.072, against 1.242 in the authors' own spreadsheet): for dijkstra it is 24% *slower* than `-O3`,
+  and only the third sequence helps. The paper's metric needs all three candidates to be compiled and timed.
 - **The Top-3 is often fewer than 3 different programs:** for CRC32 all three sequences give the same binary, for bitcount and blowfish two do.
 - **With GCC 13.3** (same sequences, no retraining) the mean drops to 1.054 and the Top-1 alone is slower than `-O3` on average (0.979).
   The gain mostly disappears, except for bitcount, susan_s and dijkstra.
 - No predicted sequence produced the same binary as `-O3`.
 
 **Measurement notes.** The CPU frequency (governor, turbo) cannot be controlled on the cluster; we used a whole node, pinning,
-warm-ups, interleaving and many runs instead. In the GCC 9.4 job, susan_s and jpeg_c were unusually noisy (below), which is why their
-intervals are wide; those two are being re-measured with the benchmark files on the node's local disk.
+warm-ups, interleaving and many runs instead. In the first GCC 9.4 job, susan_s and jpeg_c were very noisy and slow: both write large
+output files, and the benchmarks were on the cluster's shared network disk. Re-measured on the **same node with the same binaries**
+but with the files on the node's local disk (job 1035857), the noise disappears (below) and their runs are 1.0–1.7 s faster.
+The table uses the re-measured values for these two; the job script now always uses the local disk.
 
 ![Noise](results/figures/fig_noise.png)
 
@@ -136,6 +139,6 @@ scripts/measure.py          rigorous timing (warm-ups, interleaving, CIs, binary
 scripts/cluster_measure.sh  SLURM job for the cluster
 docs/ISSUES.md              the 18 reproducibility issues
 results/final_comparison.csv  paper vs laptop vs cluster (GCC 9.4 and 13.3)
-results/cluster_*/          every measurement of the two cluster jobs
+results/cluster_*/          every measurement of the three cluster jobs
 results/figures/            the figures above
 ```
