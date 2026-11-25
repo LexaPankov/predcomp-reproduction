@@ -20,6 +20,7 @@ We rebuild the authors' setup from scratch, document every problem we hit, and c
 | First results with the authors' measurement method (laptop) | ✅ Done |
 | Rigorous measurements on native Linux (department cluster, whole node, CIs) | ✅ Done, see below |
 | Same sequences with a recent compiler (GCC 13.3) | ✅ Done, see below |
+| Executed-instruction counts (frequency-independent check) | ✅ Done, see below |
 | Exact GCC 9.2 (the paper's version) | ⬜ Optional |
 
 ## Main results
@@ -71,6 +72,41 @@ but with the files on the node's local disk (job 1035857), the noise disappears 
 The table uses the re-measured values for these two; the job script now always uses the local disk.
 
 ![Noise](results/figures/fig_noise.png)
+
+### Executed instructions (frequency-independent check)
+
+The CPU frequency cannot be fixed on the cluster, so, as suggested by Prof. De Sensi, we also counted the
+**instructions each binary executes** (`perf stat -e instructions:u`, pinned, 3 runs) with
+[`scripts/count_instructions.py`](scripts/count_instructions.py). This number does not depend on the frequency.
+*Instruction reduction* = instructions of `-O3` / instructions of PredComp's best Top-3 sequence (above 1 = less work).
+If a speed-up came only from doing less work, the two numbers would be equal.
+
+![Speed-up vs instruction reduction](results/figures/fig_instructions.png)
+
+| Program | GCC 9.4: speed-up | GCC 9.4: instruction reduction | GCC 13.3: speed-up | GCC 13.3: instruction reduction |
+|---|---|---|---|---|
+| telecom_CRC32 | 1.604 | 0.951 | 0.785 | 1.000 |
+| automotive_bitcount | 1.216 | 1.223 | 1.362 | 1.217 |
+| telecom_gsm | 1.092 | 1.111 | 0.994 | 0.992 |
+| network_patricia | 1.057 | 1.024 | 1.019 | 0.961 |
+| network_dijkstra | 1.053 | 1.069 | 1.070 | 1.014 |
+| automotive_susan_s | 1.044 | 1.221 | 1.086 | 1.230 |
+| consumer_jpeg_c | 1.012 | 1.006 | 0.945 | 0.930 |
+| security_blowfish_e | 0.989 | 0.988 | 0.996 | 0.979 |
+| security_blowfish_d | 0.987 | 0.991 | 0.998 | 0.982 |
+| security_sha | 0.971 | 0.923 | 0.904 | 0.890 |
+
+- **Most gains match the reduction in instructions:** with GCC 9.4, for 7 of 10 programs the speed-up and the instruction reduction agree within about 3%.
+  This is consistent with (but does not prove) the gain coming from executing less code, and it does not depend on the CPU frequency.
+- **CRC32 is the exception:** with GCC 9.4 PredComp's binary executes 5% *more* instructions than `-O3` but is 1.60× faster.
+  So the gain cannot come from fewer instructions but from how efficiently this CPU runs the code, consistent with it shrinking to 1.05× on the laptop.
+  With GCC 13.3 the two binaries execute the same number of instructions, but PredComp's is 21% slower.
+- **susan_s:** 22% fewer instructions, but only 4% (GCC 9.4) and 9% (GCC 13.3) faster. Fewer instructions ≠ proportionally faster.
+- **dijkstra's Top-1** executes 8% (GCC 9.4) and 14% (GCC 13.3) more instructions than `-O3`, which explains why it is slower.
+- Counts are highly repeatable: binaries with the same MD5 have the same count to within 0.0001%. For GCC 9.4 the MD5s match the binaries timed above.
+- Cycles are also in the CSVs but we do **not** use them: the two jobs ran on the same core at the same time, which distorts cycles (not instructions).
+
+Data: [results/instruction_counts_vs_speedup.csv](results/instruction_counts_vs_speedup.csv), `results/instructions_*/instructions.csv`.
 
 ### First results on a laptop (authors' measurement method)
 
@@ -128,6 +164,8 @@ cd ~/predcomp-reproduction          # logs of main.py runs in ~/logs/
 sbatch scripts/cluster_measure.sh gcc9     # Ubuntu 20.04 container, GCC 9.4
 sbatch scripts/cluster_measure.sh gcc13    # node's own GCC 13.3
 sbatch scripts/cluster_measure.sh gcc9 --program automotive_susan_s,consumer_jpeg_c   # only some programs
+sbatch scripts/cluster_instructions.sh gcc9    # executed-instruction counts (1 hour max)
+sbatch scripts/cluster_instructions.sh gcc13
 ```
 
 ## Repository layout
@@ -137,8 +175,11 @@ docker/Dockerfile           environment with all dependency fixes
 scripts/apply_patches.sh    fixes to the original code
 scripts/measure.py          rigorous timing (warm-ups, interleaving, CIs, binary check)
 scripts/cluster_measure.sh  SLURM job for the cluster
+scripts/count_instructions.py     executed-instruction counts with perf stat
+scripts/cluster_instructions.sh   SLURM job for the instruction counts
 docs/ISSUES.md              the 18 reproducibility issues
 results/final_comparison.csv  paper vs laptop vs cluster (GCC 9.4 and 13.3)
 results/cluster_*/          every measurement of the three cluster jobs
+results/instructions_*/     instruction counts (GCC 9.4 and 13.3)
 results/figures/            the figures above
 ```

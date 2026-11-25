@@ -1,0 +1,10 @@
+{
+  "host": "708aae21a543",
+  "date": "2026-11-25 12:49:07",
+  "kernel": "6.8.0-142-generic",
+  "compiler": "gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0",
+  "cpu": "AMD EPYC 7301 16-Core Processor",
+  "slurm_job": "1071638",
+  "python": "3.9.21",
+  "command": "/work/repo/scripts/count_instructions.py --cbench /work/cbench --program all --from-log /work/logs/full_run_docker.log --from-log /work/logs/full_run_docker_part2.log --from-log /work/logs/full_run_docker_susan.log --from-log /work/logs/test_run_docker.log --out /work/repo/results/instructions_gcc9_job1071638"
+}

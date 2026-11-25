@@ -1,0 +1,10 @@
+{
+  "host": "node126",
+  "date": "2026-11-25 12:49:07",
+  "kernel": "6.8.0-142-generic",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "cpu": "AMD EPYC 7301 16-Core Processor",
+  "slurm_job": "1071637",
+  "python": "3.12.7",
+  "command": "/home/pavel_2247996/predcomp-reproduction/scripts/count_instructions.py --cbench /tmp/pavel_2247996_cbench_instr_gcc13_1071637 --program all --from-log /home/pavel_2247996/logs/full_run_docker.log --from-log /home/pavel_2247996/logs/full_run_docker_part2.log --from-log /home/pavel_2247996/logs/full_run_docker_susan.log --from-log /home/pavel_2247996/logs/test_run_docker.log --out /home/pavel_2247996/predcomp-reproduction/results/instructions_gcc13_job1071637"
+}
