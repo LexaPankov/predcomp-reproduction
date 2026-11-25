@@ -48,7 +48,9 @@ Brackets: bootstrap 95% confidence interval.
 
 **Bold:** significantly faster than `-O3` (the whole interval is above 1).
 \*For blowfish_d, the code optimizes `bf_enc.c`, but the authors' spreadsheet lists `bf_cfb64.c`.
-† Re-measured with the benchmark files on the node's local disk (job 1035857); see *Measurement notes*.
+† GCC 9.4 values re-measured with the benchmark files on the node's local disk (job 1035857); see *Measurement notes*.
+The GCC 13.3 values of these two programs were measured with the files on the shared file system.
+The mean of the GCC 9.4 best-of-Top-3 column as printed, without the keep-`-O3` rule, is 1.103.
 Full table: [results/final_comparison.csv](results/final_comparison.csv). Every single run: `results/cluster_*/*_raw.csv`.
 
 **What we found**
@@ -62,14 +64,23 @@ Full table: [results/final_comparison.csv](results/final_comparison.csv). Every 
   and only the third sequence helps. The paper's metric needs all three candidates to be compiled and timed.
 - **The Top-3 is often fewer than 3 different programs:** for CRC32 all three sequences give the same binary, for bitcount and blowfish two do.
 - **With GCC 13.3** (same sequences, no retraining) the mean drops to 1.054 and the Top-1 alone is slower than `-O3` on average (0.979).
-  The gain mostly disappears, except for bitcount, susan_s and dijkstra.
+  The gain halves (from 10.8% to 5.4%), and `-O3` is kept for 6 of the 10 programs; bitcount, susan_s, dijkstra and patricia still improve significantly.
+  The gain disappeared mostly where GCC 13.3's own `-O3` got faster: CRC32's `-O3` runs in 2.18 s instead of 3.20 s (almost as fast as GCC 9.4 + PredComp, 1.99 s),
+  and gsm's `-O3` is 1.11× faster (different nodes, so this is an indication, not proof).
 - No predicted sequence produced the same binary as `-O3`.
 
 **Measurement notes.** The CPU frequency (governor, turbo) cannot be controlled on the cluster; we used a whole node, pinning,
 warm-ups, interleaving and many runs instead. In the first GCC 9.4 job, susan_s and jpeg_c were very noisy and slow: both write large
 output files, and the benchmarks were on the cluster's shared network disk. Re-measured on the **same node with the same binaries**
-but with the files on the node's local disk (job 1035857), the noise disappears (below) and their runs are 1.0–1.7 s faster.
-The table uses the re-measured values for these two; the job script now always uses the local disk.
+but with the files on the node's local disk (job 1035857), the noise disappears (below) and the `-O3` medians fall by 1.1 s (susan_s) and 1.35 s (jpeg_c).
+The table uses the re-measured values for these two. The two main jobs (1035047, 1035048) ran with an earlier version of
+`cluster_measure.sh` that read the benchmarks from the home folder (shared file system); the current version always copies them to the local disk.
+
+**Stopping rule.** Rounds stop when the 95% CI of every median is within ±1%, or after 50 rounds. Four programs reached 50 rounds
+without the 1% target: CRC32 (GCC 9.4: 1.83%, GCC 13.3: 1.43%), blowfish_d (GCC 9.4: 1.26%) and jpeg_c (GCC 13.3: 2.33%).
+None of their conclusions depends on this: all their speed-up intervals lie entirely above or below 1.
+
+**Nodes.** GCC 9.4 was timed on node147, GCC 13.3 on node148 (same CPU model, AMD EPYC 7301); the instruction counts ran on node126.
 
 ![Noise](results/figures/fig_noise.png)
 
@@ -101,8 +112,8 @@ If a speed-up came only from doing less work, the two numbers would be equal.
 - **CRC32 is the exception:** with GCC 9.4 PredComp's binary executes 5% *more* instructions than `-O3` but is 1.60× faster.
   So the gain cannot come from fewer instructions but from how efficiently this CPU runs the code, consistent with it shrinking to 1.05× on the laptop.
   With GCC 13.3 the two binaries execute the same number of instructions, but PredComp's is 21% slower.
-- **susan_s:** 22% fewer instructions, but only 4% (GCC 9.4) and 9% (GCC 13.3) faster. Fewer instructions ≠ proportionally faster.
-- **dijkstra's Top-1** executes 8% (GCC 9.4) and 14% (GCC 13.3) more instructions than `-O3`, which explains why it is slower.
+- **susan_s:** 18–19% fewer instructions, but only 4% (GCC 9.4) and 9% (GCC 13.3) faster. Fewer instructions ≠ proportionally faster.
+- **dijkstra's Top-1** executes 8% (GCC 9.4) and 14% (GCC 13.3) more instructions than `-O3`, consistent with it being slower.
 - Counts are highly repeatable: binaries with the same MD5 have the same count to within 0.0001%. For GCC 9.4 the MD5s match the binaries timed above.
 - Cycles are also in the CSVs but we do **not** use them: the two jobs ran on the same core at the same time, which distorts cycles (not instructions).
 
