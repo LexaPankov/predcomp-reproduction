@@ -1,0 +1,47 @@
+{
+  "tolerance": 0.01,
+  "pass": true,
+  "groups": [
+    {
+      "program": "automotive_bitcount",
+      "configs": [
+        "top1",
+        "top2"
+      ],
+      "md5": "889de59a6d8f6ec853e0de0614142694",
+      "cycles_diff": 0.0006,
+      "ok": true
+    },
+    {
+      "program": "security_blowfish_d",
+      "configs": [
+        "top1",
+        "top3"
+      ],
+      "md5": "71d6fd3e993017f0bd85a84e77f21142",
+      "cycles_diff": 0.0003,
+      "ok": true
+    },
+    {
+      "program": "security_blowfish_e",
+      "configs": [
+        "top1",
+        "top3"
+      ],
+      "md5": "71d6fd3e993017f0bd85a84e77f21142",
+      "cycles_diff": 0.0006,
+      "ok": true
+    },
+    {
+      "program": "telecom_CRC32",
+      "configs": [
+        "top1",
+        "top2",
+        "top3"
+      ],
+      "md5": "28112f2cd2a59d1df4fc88666361af05",
+      "cycles_diff": 0.0002,
+      "ok": true
+    }
+  ]
+}

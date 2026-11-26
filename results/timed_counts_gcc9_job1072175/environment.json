@@ -1,0 +1,12 @@
+{
+  "host": "cad22fe123f1",
+  "date": "2026-11-26 15:46:28",
+  "kernel": "6.8.0-55-generic",
+  "compiler": "gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0",
+  "cpu": "AMD EPYC 7301 16-Core Processor",
+  "slurm_job": "1072175",
+  "python": "3.9.21",
+  "command": "/work/repo/scripts/count_timed_binaries.py --cbench /work/w/cbench --job-dir /work/w/job9 --out /work/repo/results/timed_counts_gcc9_job1072175",
+  "job_dir": "/work/w/job9",
+  "perf_event_paranoid": "1"
+}

@@ -1,0 +1,12 @@
+{
+  "host": "node147",
+  "date": "2026-11-26 16:04:02",
+  "kernel": "6.8.0-55-generic",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+  "cpu": "AMD EPYC 7301 16-Core Processor",
+  "slurm_job": "1072175",
+  "python": "3.12.3",
+  "command": "/home/pavel_2247996/predcomp-reproduction/scripts/count_timed_binaries.py --cbench /tmp/pavel_2247996_timedcount_1072175/cbench --job-dir /tmp/pavel_2247996_timedcount_1072175/job13 --out /home/pavel_2247996/predcomp-reproduction/results/timed_counts_gcc13_job1072175",
+  "job_dir": "/tmp/pavel_2247996_timedcount_1072175/job13",
+  "perf_event_paranoid": "1"
+}
